@@ -3017,10 +3017,20 @@ vertical-align: -.125em;
 
 </head>
 
-<body class="fullcontent">
+<body>
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#loading-inat-observations" id="toc-loading-inat-observations" class="nav-link active" data-scroll-target="#loading-inat-observations">Loading iNat observations</a></li>
+  <li><a href="#generating-tree-data" id="toc-generating-tree-data" class="nav-link" data-scroll-target="#generating-tree-data">Generating tree data</a></li>
+  <li><a href="#plotting-the-tree" id="toc-plotting-the-tree" class="nav-link" data-scroll-target="#plotting-the-tree">Plotting the tree</a></li>
+  </ul>
+</nav>
+</div>
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
@@ -3084,7 +3094,7 @@ $slug
 [1] &quot;invertefest-august-2023&quot;
 
 $taxa_count
-[1] 43005</code></pre>
+[1] 43184</code></pre>
 </div>
 </div>
 <p>We could also try to directly query the API via <code>httr::GET()</code>, but then the resulting list would need lots of cleaning.</p>

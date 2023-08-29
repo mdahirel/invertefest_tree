@@ -5,6 +5,7 @@ date: 2023-08-29
 format: 
   html: 
     embed-resources: true
+    toc: true
 theme: yeti
 execute:
   message: false
