@@ -1,0 +1,85 @@
+"0","library(tidyverse)"
+"2","── [1mAttaching core tidyverse packages[22m ────────────────────────────────────────────────────────────────────────── tidyverse 2.0.0 ──
+[32m✔[39m [34mdplyr    [39m 1.1.2     [32m✔[39m [34mreadr    [39m 2.1.4
+[32m✔[39m [34mforcats  [39m 1.0.0     [32m✔[39m [34mstringr  [39m 1.5.0
+[32m✔[39m [34mggplot2  [39m 3.4.3     [32m✔[39m [34mtibble   [39m 3.2.1
+[32m✔[39m [34mlubridate[39m 1.9.2     [32m✔[39m [34mtidyr    [39m 1.3.0
+[32m✔[39m [34mpurrr    [39m 1.0.2     "
+"2","── [1mConflicts[22m ──────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+[31m✖[39m [34mdplyr[39m::[32mfilter()[39m masks [34mstats[39m::filter()
+[31m✖[39m [34mdplyr[39m::[32mlag()[39m    masks [34mstats[39m::lag()
+[36mℹ[39m Use the ]8;;http://conflicted.r-lib.org/conflicted package]8;; to force all conflicts to become errors"
+"0","library(ape)"
+"2","
+Attachement du package : ‘ape’
+
+"
+"2","L'objet suivant est masqué depuis ‘package:dplyr’:
+
+    where
+
+"
+"0","library(rotl)"
+"0","library(ggtree)"
+"2","Registered S3 methods overwritten by 'treeio':
+  method              from    
+  MRCA.phylo          tidytree
+  MRCA.treedata       tidytree
+  Nnode.treedata      tidytree
+  Ntip.treedata       tidytree
+  ancestor.phylo      tidytree
+  ancestor.treedata   tidytree
+  child.phylo         tidytree
+  child.treedata      tidytree
+  full_join.phylo     tidytree
+  full_join.treedata  tidytree
+  groupClade.phylo    tidytree
+  groupClade.treedata tidytree
+  groupOTU.phylo      tidytree
+  groupOTU.treedata   tidytree
+  inner_join.phylo    tidytree
+  inner_join.treedata tidytree
+  is.rooted.treedata  tidytree
+  nodeid.phylo        tidytree
+  nodeid.treedata     tidytree
+  nodelab.phylo       tidytree
+  nodelab.treedata    tidytree
+  offspring.phylo     tidytree
+  offspring.treedata  tidytree
+  parent.phylo        tidytree
+  parent.treedata     tidytree
+  root.treedata       tidytree
+  rootnode.phylo      tidytree
+  sibling.phylo       tidytree
+"
+"2","[38;5;246mggtree v3.8.2 For help: https://yulab-smu.top/treedata-book/
+
+If you use the ggtree package suite in published research, please cite the appropriate paper(s):
+
+Guangchuang Yu, David Smith, Huachen Zhu, Yi Guan, Tommy Tsan-Yuk Lam. ggtree: an R package for visualization and
+annotation of phylogenetic trees with their covariates and other associated data. Methods in Ecology and Evolution.
+2017, 8(1):28-36. doi:10.1111/2041-210X.12628
+
+Guangchuang Yu.  Data Integration, Manipulation and Visualization of Phylogenetic Trees (1st edition). Chapman and
+Hall/CRC. 2022, doi:10.1201/9781003279242
+
+G Yu. Data Integration, Manipulation and Visualization of Phylogenetic Trees (1st ed.). Chapman and Hall/CRC. 2022.
+ISBN: 9781032233574 [39m
+"
+"2","
+Attachement du package : ‘ggtree’
+
+"
+"2","L'objet suivant est masqué depuis ‘package:ape’:
+
+    rotate
+
+"
+"2","L'objet suivant est masqué depuis ‘package:tidyr’:
+
+    expand
+
+"
+"0","library(here)"
+"2","here() starts at C:/Users/maxim/Documents/RECHERCHE/MISC packages and general use code/invertefest_tree
+"
