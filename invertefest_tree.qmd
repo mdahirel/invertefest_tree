@@ -2,7 +2,9 @@
 title: "Making a phylogenetic tree using #Invertefest observations"
 author: Maxime Dahirel
 date: 2023-08-29
-format: html
+format: 
+  html: 
+    embed-resources: true
 theme: yeti
 execute:
   message: false
