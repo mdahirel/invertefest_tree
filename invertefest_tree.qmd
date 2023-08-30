@@ -1,7 +1,7 @@
 ---
 title: "Making a phylogenetic tree using #Invertefest observations"
 author: Maxime Dahirel
-date: 2023-08-29
+date: 2023-08-30
 format: 
   html: 
     embed-resources: true
@@ -25,6 +25,7 @@ library(tidyverse) # CRAN v2.0.0
 library(ape)       # CRAN v5.7-1
 library(rotl)      # CRAN v3.1.0
 library(ggtree)    # Bioconductor v3.8.2
+library(rphylopic) # CRAN v1.1.1 
 library(here)      # CRAN v1.0.1
 ```
 
@@ -33,7 +34,7 @@ library(here)      # CRAN v1.0.1
 (for now?) we rely on data predownloaded manually through the [website](https://www.inaturalist.org/observations/export):
 
 ```{r load_data}
-invertefest_summer23 <- read_csv(here("raw_data","observations-354336.csv"))
+invertefest_summer23 <- read_csv(here("raw_data","observations-354362.csv"))
 ```
 
 Ideally we would use the `rinat` package instead, but it has some issues including saying the project has 1000s of obs when it only has a few 100s:
@@ -78,7 +79,7 @@ We save the tree in Newick format to `file`, and then reimport it immediately. W
 
 # Plotting the tree
 
-We use the `ggtree` package to plot and annotate the tree:
+We use the [`ggtree`](https://github.com/YuLab-SMU/ggtree) package to plot and annotate the tree. We can use many types of annotations. We're going to combine colour highlighting of major clades with [PhyloPic](https://www.phylopic.org/) images of some iconic groups, courtesy of the [`rphylopic`](https://rphylopic.palaeoverse.org/) package.
 
 ```{r annotations}
 d1 <- data.frame(node=c(length(my_tree$tip.label)+which(my_tree$node.label=="Insecta"),
@@ -88,14 +89,46 @@ d1 <- data.frame(node=c(length(my_tree$tip.label)+which(my_tree$node.label=="Ins
                        ), 
                 taxon=c("Insects","Myriapods","Spiders","Gastropods"))
 
+
+d2 <- data.frame(node=c(length(my_tree$tip.label)+which(my_tree$node.label=="Diptera"),
+                       length(my_tree$tip.label)+which(my_tree$node.label=="Hymenoptera"),
+                       length(my_tree$tip.label)+which(my_tree$node.label=="Coleoptera"),
+                       length(my_tree$tip.label)+which(my_tree$node.label=="Lepidoptera"),
+                       length(my_tree$tip.label)+which(my_tree$node.label=="Orthoptera"),
+                       length(my_tree$tip.label)+which(my_tree$node.label=="Araneae"),
+                       length(my_tree$tip.label)+which(my_tree$node.label=="Gastropoda"),
+                       length(my_tree$tip.label)+which(my_tree$node.label=="Odonata"),
+                       length(my_tree$tip.label)+which(my_tree$node.label=="Hemiptera"),
+                       length(my_tree$tip.label)+which(my_tree$node.label=="Myriapoda")
+                       ), 
+                taxon=c("Diptera","Hymenoptera","Coleoptera","Lepidoptera",
+                        "Orthoptera","Araneae","Gastropoda","Odonata","Hemiptera","Myriapoda"),
+                image=c(
+                  get_uuid(name = "Drosophila americana", n = 1),
+                  get_uuid(name = "Vespula", n = 1),
+                  get_uuid(name = "Carabus", n = 1),
+                  get_uuid(name = "Papilio", n = 1),
+                  get_uuid(name = "Acrididae", n = 1),
+                  get_uuid(name = "Araneus", n = 1),
+                  get_uuid(name = "Helix aspersa", n = 1),
+                  get_uuid(name = "Sympetrum", n = 1),
+                  get_uuid(name = "Lycorma delicatula", n = 1),
+                  get_uuid(name = "Scolopendromorpha", n = 1)
+                ))
 ```
 (tips are counted as nodes for `ggtree` purposes, that's why we add the number of tips to get the correct node values)
 
 ```{r tree}
 #| output: true
+#| fig-width: 8
+#| fig-height: 10
+#| 
 ggtree(my_tree, layout="fan")+
   geom_highlight(data=d1,aes(node=node,fill=taxon),alpha=1)+
   geom_tree()+
+  geom_cladelab(data = d2, 
+                mapping = aes(node = node, label = taxon, image = image), imagesize=0.1, 
+                geom = "phylopic", imagecolor = "black", offset=1, offset.text=10,alpha=1)+
   scale_fill_brewer(type="qual")
 ```
 
