@@ -31,7 +31,7 @@ library(here)      # CRAN v1.0.1
 
 # Loading iNat observations
 
-(for now?) we rely on data predownloaded manually through the [website](https://www.inaturalist.org/observations/export):
+(for now?) we rely on data predownloaded manually through the [website](https://www.inaturalist.org/observations/export?projects=invertefest-august-2023):
 
 ```{r load_data}
 invertefest_summer23 <- read_csv(here("raw_data","observations-354487.csv"))
