@@ -31,6 +31,7 @@ library(rotl)      # CRAN v3.1.0
 library(ggtree)    # Bioconductor v3.8.2
 library(ggtext)    # CRAN v0.1.2
 library(rphylopic) # CRAN v1.1.1 
+library(showtext)  # CRAN v0.9-6  
 library(here)      # CRAN v1.0.1
 ```
 
@@ -165,10 +166,6 @@ phylopic_credit <- paste0("Animal silhouettes are from **phylopic.org**. ",paste
 
 figure_author <- "Data visualisation by **Maxime Dahirel**, underlying code: **github.com/mdahirel/invertefest_tree**"
 
-full_credit <- paste0(figure_author,"<br/><br/>",
-                      str_wrap(phylopic_credit,100)|> str_replace_all("\n","<br/>")
-)
-
 #(tips are counted as nodes for `ggtree` purposes, that's why we add the number of tips to get the correct node values)
 ```
 
@@ -177,6 +174,12 @@ full_credit <- paste0(figure_author,"<br/><br/>",
 #| output: true
 #| fig-width: 8
 #| fig-height: 10
+#| fig.showtext: TRUE
+font_add_google(name="Open Sans",family="Open Sans")
+font_add_google(name="Ubuntu",family="Ubuntu")
+
+# showtext_auto()
+
 ggtree(my_tree, layout = "fan") +
   geom_highlight(data = d1, aes(node = node, fill = taxon), alpha = 1) +
   geom_tree() +
@@ -189,10 +192,12 @@ ggtree(my_tree, layout = "fan") +
   labs(
     title="**How diversified are #InverteFest observations?**",
     subtitle="A phylogenetic tree based on iNaturalist data from August 2023",
-    caption = full_credit
+    caption = paste0(figure_author,"<br/><br/>",phylopic_credit)
   )+
-    theme(plot.title=element_markdown(),
-          plot.caption = element_markdown(size=8))
+  theme(text=element_text(family = "Ubuntu"),
+        plot.title=element_markdown(family = "Open Sans", size = 16),
+        plot.subtitle=element_markdown(family = "Ubuntu"),
+        plot.caption = element_textbox_simple(family = "Ubuntu",size=8,halign=1))
 ```
 
 
