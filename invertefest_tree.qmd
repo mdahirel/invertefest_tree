@@ -1,7 +1,8 @@
 ---
 title: "Making a phylogenetic tree using #Invertefest observations"
 author: Maxime Dahirel
-date: 2023-08-30
+date: today
+date-format: iso
 format: 
   html: 
     embed-resources: true
@@ -28,6 +29,7 @@ library(httr)      # CRAN v1.4.7
 library(ape)       # CRAN v5.7-1
 library(rotl)      # CRAN v3.1.0
 library(ggtree)    # Bioconductor v3.8.2
+library(ggtext)    # CRAN v0.1.2
 library(rphylopic) # CRAN v1.1.1 
 library(here)      # CRAN v1.0.1
 ```
@@ -143,7 +145,7 @@ d2 <- data.frame(
     get_uuid(name = "Helix aspersa", n = 1),
     get_uuid(name = "Sympetrum", n = 1),
     get_uuid(name = "Lycorma delicatula", n = 1),
-    get_uuid(name = "Scolopendromorpha", n = 1)
+    get_uuid(name = "Lithobius forficatus", n = 1)
   )
 ) |> 
   mutate(contributor = map(.x=image,.f=~.x |> get_attribution() |> pluck("contributor")),
@@ -156,9 +158,16 @@ d2 <- data.frame(
   mutate(lic=str_replace_all(lic,"/"," ") |> 
            str_to_upper()) |> 
   mutate(lic=case_when(lic!="*"~paste("CC", lic),TRUE~"public domain")) |> 
-  mutate(attr = paste0(taxon,": ", contributor, ", ", lic))
+  mutate(attr = paste0(taxon,": ", contributor, ", ", lic)) |> 
+  arrange(taxon)
 
-phylopic_credit <- paste0("Animal silhouettes are from Phylopic. ",paste(d2$attr,collapse="; "),".")
+phylopic_credit <- paste0("Animal silhouettes are from **phylopic.org**. ",paste(d2$attr,collapse="; "),".")
+
+figure_author <- "Data visualisation by **Maxime Dahirel**, underlying code: **github.com/mdahirel/invertefest_tree**"
+
+full_credit <- paste0(figure_author,"<br/><br/>",
+                      str_wrap(phylopic_credit,100)|> str_replace_all("\n","<br/>")
+)
 
 #(tips are counted as nodes for `ggtree` purposes, that's why we add the number of tips to get the correct node values)
 ```
@@ -176,12 +185,14 @@ ggtree(my_tree, layout = "fan") +
     mapping = aes(node = node, label = taxon, image = image), imagesize = 0.1,
     geom = "phylopic", imagecolor = "black", offset = 1, offset.text = 10, alpha = 1
   ) +
-  scale_fill_brewer(type = "qual") + 
+  scale_fill_brewer(name= "Taxon",type = "qual") + 
   labs(
-    title="How diversified are #InverteFest observations?",
+    title="**How diversified are #InverteFest observations?**",
     subtitle="A phylogenetic tree based on iNaturalist data from August 2023",
-    caption = str_wrap(phylopic_credit,100))+
-    theme(plot.caption = element_text(size=7))
+    caption = full_credit
+  )+
+    theme(plot.title=element_markdown(),
+          plot.caption = element_markdown(size=8))
 ```
 
 
