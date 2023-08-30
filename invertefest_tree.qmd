@@ -34,7 +34,7 @@ library(here)      # CRAN v1.0.1
 (for now?) we rely on data predownloaded manually through the [website](https://www.inaturalist.org/observations/export):
 
 ```{r load_data}
-invertefest_summer23 <- read_csv(here("raw_data","observations-354362.csv"))
+invertefest_summer23 <- read_csv(here("raw_data","observations-354487.csv"))
 ```
 
 Ideally we would use the `rinat` package instead, but it has some issues including saying the project has 1000s of obs when it only has a few 100s:
@@ -61,7 +61,10 @@ taxa <- unique(invertefest_summer23$scientific_name)
 resolved_names <- tnrs_match_names(taxa,  context_name = "Animals") 
 
 filtered_names <- resolved_names |> 
-  filter(!is.na(ott_id) & !str_detect(flags,"incertae_sedis"))
+  filter(!is.na(ott_id) & 
+           flags %in% c("", "sibling_higher","infraspecific") & 
+           score > 0.9) 
+# easier to keep valid flags than trying to check for every new invalid flag that appears with update
 ```
 (not all obs are successfully matched to a taxon name on the ‘synthetic tree’ from Open Tree of Life, so we lose a few in the process)
 
@@ -85,9 +88,9 @@ We use the [`ggtree`](https://github.com/YuLab-SMU/ggtree) package to plot and a
 d1 <- data.frame(node=c(length(my_tree$tip.label)+which(my_tree$node.label=="Insecta"),
                        length(my_tree$tip.label)+which(my_tree$node.label=="Myriapoda"),
                        length(my_tree$tip.label)+which(my_tree$node.label=="Araneae"),
-                       length(my_tree$tip.label)+which(my_tree$node.label=="Gastropoda")
+                       length(my_tree$tip.label)+which(my_tree$node.label=="Mollusca")
                        ), 
-                taxon=c("Insects","Myriapods","Spiders","Gastropods"))
+                taxon=c("Insects","Myriapods","Spiders","Molluscs"))
 
 
 d2 <- data.frame(node=c(length(my_tree$tip.label)+which(my_tree$node.label=="Diptera"),
