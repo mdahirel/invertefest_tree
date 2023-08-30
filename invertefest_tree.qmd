@@ -22,6 +22,7 @@ During this summer's (2023) \#Invertefest, I randomly decided it would be neat t
 
 ```{r load_packages}
 library(tidyverse) # CRAN v2.0.0
+library(httr)      # CRAN v1.4.7
 library(ape)       # CRAN v5.7-1
 library(rotl)      # CRAN v3.1.0
 library(ggtree)    # Bioconductor v3.8.2
@@ -31,39 +32,57 @@ library(here)      # CRAN v1.0.1
 
 # Loading iNat observations
 
-(for now?) we rely on data predownloaded manually through the [website](https://www.inaturalist.org/observations/export?projects=invertefest-august-2023):
+There are in theory three options to get the list of observed taxa.
+
+(i) we can rely on data predownloaded manually through the [website](https://www.inaturalist.org/observations/export?projects=invertefest-august-2023):
 
 ```{r load_data}
-invertefest_summer23 <- read_csv(here("raw_data","observations-354487.csv"))
+#invertefest_summer23 <- read_csv(here("raw_data","observations-354487.csv"))
 ```
 
-Ideally we would use the `rinat` package instead, but it has some issues including saying the project has 1000s of obs when it only has a few 100s:
+(ii) we could use the `rinat` package instead, but it has some known issues; here it says the project has 1000s of obs when it only has a few 100s.
 
-```{r rinat_fail}
-#| output: true
-library(rinat)     # CRAN v0.1.9
-rinat_descr <- get_inat_obs_project("invertefest-august-2023", type = "info", raw = FALSE)
+(iii) we can also directly query the API via `httr::GET()`:
 
-rinat_descr[c("title","slug","taxa_count")] # this is the right project, but way too many obs
+```{r get_data_api}
+# first let's make a general request to see how many obs there is
+request <- GET("https://api.inaturalist.org/v1/observations?project_id=invertefest-august-2023")
+request_parsed <- content(request)
+N_obs <- request_parsed$total_results
+
+Npages <- ceiling(N_obs / 200) # with a max per page set at 200, this gives the number of page requests we're gonna need
+
+prefix_url <- "https://api.inaturalist.org/v1/observations?project_id=invertefest-august-2023&page="
+suffix_url <- "&per_page=200&order=desc&order_by=created_at"
+
+invertefest_summer23 <- tibble(page = 1:Npages) |>
+  mutate(url = paste0(prefix_url, page, suffix_url)) |>
+  mutate(response = map(.x = url, .f = ~ .x |> GET())) |>
+  mutate(parsed = map(.x = response, .f = ~ .x |>
+    content() |>
+    pluck("results"))) |> # we get the list containing the results for each page
+  unnest(parsed) |>
+  mutate(scientific_name = map(.x = parsed, .f = ~ .x |> pluck("taxon", "name"))) |> # we extract the taxon name
+  unnest(scientific_name)
+
 ```
 
-We could also try to directly query the API via `httr::GET()`, but then the resulting list would need lots of cleaning.
 
 # Generating tree data
 
 Now that we have our data, we are going to use the `rotl` package to:  
-- standardize taxon names  
-- get the subtree of the Tree of Life from these taxon names  
+- standardize taxon names, filter names with mismatches to the Open Tree Of Life, imperfect character matches or other flags  
+- get the subtree of the Open Tree of Life from these taxon names  
 
 ```{r get_ott_ids}
 taxa <- unique(invertefest_summer23$scientific_name)
 
-resolved_names <- tnrs_match_names(taxa,  context_name = "Animals") 
+resolved_names <- tnrs_match_names(taxa, context_name = "Animals")
 
-filtered_names <- resolved_names |> 
-  filter(!is.na(ott_id) & 
-           flags %in% c("", "sibling_higher","infraspecific") & 
-           score > 0.9) 
+filtered_names <- resolved_names |>
+  filter(!is.na(ott_id) &
+    flags %in% c("", "sibling_higher", "infraspecific") &
+    score > 0.9)
 # easier to keep valid flags than trying to check for every new invalid flag that appears with update
 ```
 (not all obs are successfully matched to a taxon name on the ‘synthetic tree’ from Open Tree of Life, so we lose a few in the process)
@@ -71,11 +90,10 @@ filtered_names <- resolved_names |>
 ```{r get_subtree}
 tol_induced_subtree(
   ott_ids = unique(filtered_names$ott_id),
-  label_format="name", file=here("tree_data","tree.newick"))
+  label_format = "name", file = here("tree_data", "tree.newick")
+)
 
-
-my_tree <- ape::read.tree(here("tree_data","tree.newick"))
-
+my_tree <- ape::read.tree(here("tree_data", "tree.newick"))
 ```
 
 We save the tree in Newick format to `file`, and then reimport it immediately. We actually don't need to do that in most cases, we could directly get the tree as a `phylo` object, by letting the `file` argument empty. But doing that tends to collapse a lot of internal nodes (which contains the clade names), and we're going to use some of those to annotate the tree.
@@ -85,39 +103,47 @@ We save the tree in Newick format to `file`, and then reimport it immediately. W
 We use the [`ggtree`](https://github.com/YuLab-SMU/ggtree) package to plot and annotate the tree. We can use many types of annotations. We're going to combine colour highlighting of major clades with [PhyloPic](https://www.phylopic.org/) images of some iconic groups, courtesy of the [`rphylopic`](https://rphylopic.palaeoverse.org/) package.
 
 ```{r annotations}
-d1 <- data.frame(node=c(length(my_tree$tip.label)+which(my_tree$node.label=="Insecta"),
-                       length(my_tree$tip.label)+which(my_tree$node.label=="Myriapoda"),
-                       length(my_tree$tip.label)+which(my_tree$node.label=="Araneae"),
-                       length(my_tree$tip.label)+which(my_tree$node.label=="Mollusca")
-                       ), 
-                taxon=c("Insects","Myriapods","Spiders","Molluscs"))
+d1 <- data.frame(
+  node = c(
+    length(my_tree$tip.label) + which(my_tree$node.label == "Insecta"),
+    length(my_tree$tip.label) + which(my_tree$node.label == "Myriapoda"),
+    length(my_tree$tip.label) + which(my_tree$node.label == "Araneae"),
+    length(my_tree$tip.label) + which(my_tree$node.label == "Mollusca")
+  ),
+  taxon = c("Insects", "Myriapods", "Spiders", "Molluscs")
+)
 
 
-d2 <- data.frame(node=c(length(my_tree$tip.label)+which(my_tree$node.label=="Diptera"),
-                       length(my_tree$tip.label)+which(my_tree$node.label=="Hymenoptera"),
-                       length(my_tree$tip.label)+which(my_tree$node.label=="Coleoptera"),
-                       length(my_tree$tip.label)+which(my_tree$node.label=="Lepidoptera"),
-                       length(my_tree$tip.label)+which(my_tree$node.label=="Orthoptera"),
-                       length(my_tree$tip.label)+which(my_tree$node.label=="Araneae"),
-                       length(my_tree$tip.label)+which(my_tree$node.label=="Gastropoda"),
-                       length(my_tree$tip.label)+which(my_tree$node.label=="Odonata"),
-                       length(my_tree$tip.label)+which(my_tree$node.label=="Hemiptera"),
-                       length(my_tree$tip.label)+which(my_tree$node.label=="Myriapoda")
-                       ), 
-                taxon=c("Diptera","Hymenoptera","Coleoptera","Lepidoptera",
-                        "Orthoptera","Araneae","Gastropoda","Odonata","Hemiptera","Myriapoda"),
-                image=c(
-                  get_uuid(name = "Drosophila americana", n = 1),
-                  get_uuid(name = "Vespula", n = 1),
-                  get_uuid(name = "Carabus", n = 1),
-                  get_uuid(name = "Papilio", n = 1),
-                  get_uuid(name = "Acrididae", n = 1),
-                  get_uuid(name = "Araneus", n = 1),
-                  get_uuid(name = "Helix aspersa", n = 1),
-                  get_uuid(name = "Sympetrum", n = 1),
-                  get_uuid(name = "Lycorma delicatula", n = 1),
-                  get_uuid(name = "Scolopendromorpha", n = 1)
-                ))
+d2 <- data.frame(
+  node = c(
+    length(my_tree$tip.label) + which(my_tree$node.label == "Diptera"),
+    length(my_tree$tip.label) + which(my_tree$node.label == "Hymenoptera"),
+    length(my_tree$tip.label) + which(my_tree$node.label == "Coleoptera"),
+    length(my_tree$tip.label) + which(my_tree$node.label == "Lepidoptera"),
+    length(my_tree$tip.label) + which(my_tree$node.label == "Orthoptera"),
+    length(my_tree$tip.label) + which(my_tree$node.label == "Araneae"),
+    length(my_tree$tip.label) + which(my_tree$node.label == "Gastropoda"),
+    length(my_tree$tip.label) + which(my_tree$node.label == "Odonata"),
+    length(my_tree$tip.label) + which(my_tree$node.label == "Hemiptera"),
+    length(my_tree$tip.label) + which(my_tree$node.label == "Myriapoda")
+  ),
+  taxon = c(
+    "Diptera", "Hymenoptera", "Coleoptera", "Lepidoptera",
+    "Orthoptera", "Araneae", "Gastropoda", "Odonata", "Hemiptera", "Myriapoda"
+  ),
+  image = c(
+    get_uuid(name = "Drosophila americana", n = 1),
+    get_uuid(name = "Vespula", n = 1),
+    get_uuid(name = "Carabus", n = 1),
+    get_uuid(name = "Papilio", n = 1),
+    get_uuid(name = "Acrididae", n = 1),
+    get_uuid(name = "Araneus", n = 1),
+    get_uuid(name = "Helix aspersa", n = 1),
+    get_uuid(name = "Sympetrum", n = 1),
+    get_uuid(name = "Lycorma delicatula", n = 1),
+    get_uuid(name = "Scolopendromorpha", n = 1)
+  )
+)
 ```
 (tips are counted as nodes for `ggtree` purposes, that's why we add the number of tips to get the correct node values)
 
@@ -126,13 +152,15 @@ d2 <- data.frame(node=c(length(my_tree$tip.label)+which(my_tree$node.label=="Dip
 #| fig-width: 8
 #| fig-height: 10
 #| 
-ggtree(my_tree, layout="fan")+
-  geom_highlight(data=d1,aes(node=node,fill=taxon),alpha=1)+
-  geom_tree()+
-  geom_cladelab(data = d2, 
-                mapping = aes(node = node, label = taxon, image = image), imagesize=0.1, 
-                geom = "phylopic", imagecolor = "black", offset=1, offset.text=10,alpha=1)+
-  scale_fill_brewer(type="qual")
+ggtree(my_tree, layout = "fan") +
+  geom_highlight(data = d1, aes(node = node, fill = taxon), alpha = 1) +
+  geom_tree() +
+  geom_cladelab(
+    data = d2,
+    mapping = aes(node = node, label = taxon, image = image), imagesize = 0.1,
+    geom = "phylopic", imagecolor = "black", offset = 1, offset.text = 10, alpha = 1
+  ) +
+  scale_fill_brewer(type = "qual")
 ```
 
 
