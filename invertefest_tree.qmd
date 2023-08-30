@@ -111,11 +111,12 @@ We use the [`ggtree`](https://github.com/YuLab-SMU/ggtree) package to plot and a
 d1 <- data.frame(
   node = c(
     length(my_tree$tip.label) + which(my_tree$node.label == "Insecta"),
-    length(my_tree$tip.label) + which(my_tree$node.label == "Myriapoda"),
+    length(my_tree$tip.label) + which(my_tree$node.label == "Malacostraca"),
     length(my_tree$tip.label) + which(my_tree$node.label == "Araneae"),
-    length(my_tree$tip.label) + which(my_tree$node.label == "Mollusca")
+    length(my_tree$tip.label) + which(my_tree$node.label == "Mollusca"),
+    length(my_tree$tip.label) + which(my_tree$node.label == "Myriapoda")
   ),
-  taxon = c("Insects", "Myriapods", "Spiders", "Molluscs")
+  taxon = c("Insects", "Malacostracans","Spiders", "Molluscs", "Myriapods")
 )
 
 
@@ -181,23 +182,24 @@ font_add_google(name="Ubuntu",family="Ubuntu")
 # showtext_auto()
 
 ggtree(my_tree, layout = "fan") +
-  geom_highlight(data = d1, aes(node = node, fill = taxon), alpha = 1) +
+  geom_highlight(data = d1, aes(node = node, fill = taxon)) +
   geom_tree() +
   geom_cladelab(
     data = d2,
     mapping = aes(node = node, label = taxon, image = image), imagesize = 0.1,
     geom = "phylopic", imagecolor = "black", offset = 1, offset.text = 10, alpha = 1
   ) +
-  scale_fill_brewer(name= "Taxon",type = "qual") + 
+  scale_fill_brewer(name= "**Highlighted taxa**",palette = "Dark2") + 
   labs(
     title="**How diversified are #InverteFest observations?**",
-    subtitle="A phylogenetic tree based on iNaturalist data from August 2023",
+    subtitle="A phylogenetic tree based on **iNaturalist** data from August 2023",
     caption = paste0(figure_author,"<br/><br/>",phylopic_credit)
   )+
   theme(text=element_text(family = "Ubuntu"),
         plot.title=element_markdown(family = "Open Sans", size = 16),
         plot.subtitle=element_markdown(family = "Ubuntu"),
-        plot.caption = element_textbox_simple(family = "Ubuntu",size=8,halign=1))
+        legend.title=element_markdown(family = "Ubuntu"),
+        plot.caption = element_textbox_simple(family = "Ubuntu",size=8, halign=1))
 ```
 
 
