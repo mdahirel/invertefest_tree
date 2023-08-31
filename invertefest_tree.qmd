@@ -175,8 +175,9 @@ figure_author <- "Data visualisation by **Maxime Dahirel**, underlying code: **g
 ```{r tree}
 #| output: true
 #| fig-width: 8
-#| fig-height: 10
+#| fig-height: 9
 #| fig.showtext: TRUE
+#| fig-dpi: 300
 font_add_google(name="Open Sans",family="Open Sans")
 font_add_google(name="Ubuntu",family="Ubuntu")
 
@@ -188,7 +189,7 @@ ggtree(my_tree, layout = "fan") +
   geom_cladelab(
     data = d2,
     mapping = aes(node = node, label = taxon, image = image), imagesize = 0.1,
-    geom = "phylopic", imagecolor = "black", offset = 1, offset.text = 10, alpha = 1
+    geom = "phylopic", imagecolour = "black", offset = 1, offset.text = 10, alpha = 1
   ) +
   scale_fill_brewer(name= "**Highlighted taxa**",palette = "Dark2") + 
   labs(
@@ -196,11 +197,14 @@ ggtree(my_tree, layout = "fan") +
     subtitle="A phylogenetic tree based on **iNaturalist** data from August 2023",
     caption = paste0(figure_author,"<br/><br/>",phylopic_credit)
   )+
-  theme(text=element_text(family = "Ubuntu"),
-        plot.title=element_markdown(family = "Open Sans", size = 16),
+  theme(text=element_text(family = "Ubuntu", size = 12),
+        plot.title=element_markdown(family = "Open Sans", size = 18),
         plot.subtitle=element_markdown(family = "Ubuntu"),
         legend.title=element_markdown(family = "Ubuntu"),
-        plot.caption = element_textbox_simple(family = "Ubuntu",size=8, halign=1))
+        # legend.position = "bottom",
+        plot.caption = element_textbox_simple(family = "Ubuntu",size=9, halign=1),
+        plot.caption.position = "plot"
+        )
 ```
 
 
