@@ -183,7 +183,7 @@ font_add_google(name="Ubuntu",family="Ubuntu")
 
 # showtext_auto()
 
-ggtree(my_tree, layout = "fan") +
+ggtree(my_tree, layout = "circular") +
   geom_highlight(data = d1, aes(node = node, fill = taxon)) +
   geom_tree() +
   geom_cladelab(
