@@ -82,13 +82,14 @@ Now that we have our data, we are going to use the `rotl` package to:
 ```{r get_ott_ids}
 taxa <- unique(invertefest_summer23$scientific_name)
 
-resolved_names <- tnrs_match_names(taxa, context_name = "Animals")
+resolved_names <- tnrs_match_names(taxa, context_name = "Animals")|>
+  filter(!is.na(ott_id))
+
+resolved_names$in_tree <- is_in_tree(resolved_names$ott_id) # takes a while
+# filtering out flags likely to signal "not in tree" status (eg incertae sedis) works faster but may be more approximate/trial-and-error
 
 filtered_names <- resolved_names |>
-  filter(!is.na(ott_id) &
-    flags %in% c("", "sibling_higher", "infraspecific") &
-    score > 0.9)
-# easier to keep valid flags than trying to check for every new invalid flag that appears with update
+  filter(in_tree==TRUE & score > 0.9) # can adjust score
 ```
 (not all obs are successfully matched to a taxon name on the ‘synthetic tree’ from Open Tree of Life, so we lose a few in the process)
 
