@@ -202,7 +202,7 @@ ggtree(my_tree, layout = "fan") +
         plot.subtitle=element_markdown(family = "Ubuntu"),
         legend.title=element_markdown(family = "Ubuntu"),
         # legend.position = "bottom",
-        plot.caption = element_textbox_simple(family = "Ubuntu",size=9, halign=1),
+        plot.caption = element_textbox_simple(family = "Ubuntu",size=8, halign=1),
         plot.caption.position = "plot"
         )
 ```
