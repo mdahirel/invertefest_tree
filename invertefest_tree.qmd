@@ -210,7 +210,7 @@ ggtree(my_tree, layout = "circular") +
         plot.title=element_markdown(family = "Open Sans", size = 18),
         plot.subtitle=element_markdown(family = "Ubuntu"),
         legend.title=element_markdown(family = "Ubuntu"),
-        # legend.position = "bottom",
+        #legend.position = "bottom",
         plot.caption = element_textbox_simple(family = "Ubuntu",size=8, halign=1),
         plot.caption.position = "plot"
         )
