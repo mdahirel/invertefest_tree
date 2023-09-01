@@ -51,6 +51,10 @@ There are in two main options to get the list of observed taxa. We can rely on d
 request <- GET("https://api.inaturalist.org/v1/observations?project_id=invertefest-august-2023")
 request_parsed <- content(request)
 N_obs <- request_parsed$total_results
+# this is the right number, compare with rinat which give a number that's way too high
+# library(rinat)
+# N_obs_rinat <- rinat::get_inat_obs_project("invertefest-august-2023",type="info")$taxa_count
+#THIS is wrong
 
 Npages <- ceiling(N_obs / 200) # with a max per page set at 200, this gives the number of page requests we're gonna need
 
