@@ -227,5 +227,5 @@ knitr::include_graphics(here("tree_plots","tree.svg"))
 ```
 
 ::: {.callout-note}
-If you took the time to zoom in count (why?), you may have noticed that there are fewer tips in the tree than we have "valid" OTT IDs (`r length(my_tree$tip.label)` vs `r length(unique(filtered_names$ott_id))`, actually). This is because higher-level IDs will end up as internal nodes if there exists another observation from the same taxon but with a more precise ID (for instance, for a set of two observations, one identified as *Cepaea* sp. and one as *Cepaea nemoralis*, we would end up with only one tip in the tree, *Cepaea nemoralis*, with *Cepaea* as an internal node).
+If you took the time to zoom in and count (why?), you may have noticed that there are fewer tips in the tree than we have "valid" OTT IDs (`r length(my_tree$tip.label)` vs `r length(unique(filtered_names$ott_id))`, actually). This is because higher-level IDs will end up as internal nodes if there exists another observation from the same taxon but with a more precise ID (for instance, for a set of two observations, one identified as *Cepaea* sp. and one as *Cepaea nemoralis*, we would end up with only one tip in the tree, *Cepaea nemoralis*, with *Cepaea* as an internal node).
 :::
