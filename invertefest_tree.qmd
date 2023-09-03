@@ -208,14 +208,14 @@ p <- ggtree(my_tree, layout = "circular", size=tree_line_width) +
   scale_fill_brewer(name= "**Highlighted taxa**",palette = "Dark2") + 
   labs(
     title="**How diversified are #InverteFest observations?**",
-    subtitle="A phylogenetic tree based on **iNaturalist** data from August 2023",
+    subtitle="A phylogenetic tree based on **iNaturalist** data from the August 2023 event",
     caption = paste0(figure_author,"<br/><br/>",phylopic_credit)
   )+
   theme(text=element_text(family = "Ubuntu", size = 12),
         plot.title=element_markdown(family = "Open Sans", size = 18),
         plot.subtitle=element_markdown(family = "Ubuntu"),
         legend.title=element_markdown(family = "Ubuntu"),
-        #legend.position = "bottom",
+        legend.justification = "right",
         plot.caption = element_textbox_simple(family = "Ubuntu",size=8, halign=1),
         plot.caption.position = "plot"
         )
